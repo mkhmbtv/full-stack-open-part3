@@ -1,4 +1,3 @@
-const { request, response } = require('express')
 const express = require('express')
 const app = express()
 
@@ -37,6 +36,30 @@ app.get('/info', (request, response) => {
         `<p>${info}</p>
         ${new Date()}`
     )
+})
+
+app.post('/api/persons', (request, response) => {
+    const body = request.body
+    const alreadyExists = persons.find(person => person.name === body.name)
+
+    if (!body.name || !body.number) {
+        return response.status(400).json({
+            error: 'missing name and/or number'
+        })
+    } else if (alreadyExists) {
+        return response.status(400).json({
+            error: 'name already exists in the phonebook'
+        })
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: Math.round(Math.random() * 1000),
+    }
+
+    persons = persons.concat(person)
+    response.json(person)
 })
 
 app.get('/api/persons/:id', (request, response) => {
